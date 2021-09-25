@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  caaj_evm:
+    container_name: caaj_evm
+    build: ./
+    volumes:
+      - ./src:/app
+    command: /bin/bash
+    tty: true
