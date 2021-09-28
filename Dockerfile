@@ -3,3 +3,4 @@ USER root
 
 
 RUN pip install web3
+RUN pip install -e .[dev]
