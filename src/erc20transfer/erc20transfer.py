@@ -14,26 +14,24 @@ class ERC20Transfer:
 
   ERC20_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'
 
-  settings = json.loads(open('%s/../settings.json' % os.path.dirname(__file__)).read())
-  web3 = Web3(HTTPProvider('https://mainnet.infura.io/v3/%s' % settings['infra_key']))
   erc20_abi = json.loads(open('%s/erc20_abi.json' % os.path.dirname(__file__)).read())
   getcontext().prec = 50
 
-  def __init__(self, transfer):
+  def __init__(self, web3, transfer):
     self.transfer = transfer
     self.decimal = None
     self.symbol = None
-    self.contract = ERC20Transfer.web3.eth.contract(address=Web3.toChecksumAddress(transfer['address'].lower()), abi=ERC20Transfer.erc20_abi)
+    self.contract = web3.eth.contract(address=Web3.toChecksumAddress(transfer['address'].lower()), abi=ERC20Transfer.erc20_abi)
 
   @classmethod
-  def get_erc20_transfers(cls, tx, direction):
+  def get_erc20_transfers(cls, web3, tx, direction):
     if direction not in [cls.SEND, cls.RECEIVE]:
       raise ValueError('invalid direction is set. Put ERC20Transfer.SEND or ERC20Transfer.RECEIVE')
     logs = tx['logs']
     address = tx['from'].lower()
     logs = cls.__merge_weth_transfer(logs, address)
     transfers = list(filter(lambda item: (item['topics'][0].hex().lower() == cls.ERC20_TRANSFER_TOPIC and '0x' + item['topics'][direction].hex().lower()[26:] == address), logs))
-    transfers = list(map(lambda item: ERC20Transfer(item), transfers))
+    transfers = list(map(lambda item: ERC20Transfer(web3, item), transfers))
     return transfers
 
   @classmethod
