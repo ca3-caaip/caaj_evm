@@ -6,5 +6,5 @@ class CaajPlugin(metaclass=ABCMeta):
     pass
 
   @abstractmethod
-  def get_caajs(self, transaction):
+  def get_caajs(self, transaction, subject_address):
     pass
